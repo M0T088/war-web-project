@@ -2,6 +2,11 @@ String maven = "maven:3.6.3-adoptopenjdk-14"
 pipeline {
     agent any
     stages {
+        stage('docker-compose up') {
+          steps {
+            sh 'docker-compose up -d'
+          }
+        }
         stage('war File') {
             agent {
                 docker {
