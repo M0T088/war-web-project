@@ -1,0 +1,16 @@
+- name: Nginx Test Seite
+  hosts: localhost
+  tasks:
+    - name: Start container with healthstatus
+      docker_container:
+        name: nginx-proxy
+        image: nginx:1.13
+        state: started
+        healthcheck:
+          # Check if nginx server is healthy by curl'ing the server.
+          # If this fails or timeouts, the healthcheck fails.
+          test: ["CMD", "curl", "--fail", "http://nginx.host.com"]
+          interval: 1m30s
+          timeout: 10s
+          retries: 3
+          start_period: 30s

@@ -1,0 +1,27 @@
+### This play deploys a webapp war to an tomcat server
+---
+- name: Deploy the application secrets to the "staging" server
+  hosts: staging
+  remote_user: vagrant
+  become: yes
+  tasks:
+    - name: Copy the war file {{ webapp_name }}.war as {{ webapp_name }}.war.tmp to {{ webapp_destination_folder }}
+    win_copy:
+        src: files/{{ webapp_name }}.war
+        dest: "{{ webapp_destination_folder }}\\{{ webapp_name }}.war.tmp"
+        force: yes 
+
+    - name: Remove current war file {{ webapp_destination_folder }}\{{ webapp_name }}.war
+    win_file:
+        path: "{{ webapp_destination_folder }}\\{{ webapp_name }}.war"
+        state: absent
+
+    - name: Wait until the webapp folder {{ webapp_destination_folder }}\{{ webapp_name }} is deleted
+    win_wait_for:
+        path: "{{ webapp_destination_folder }}\\{{ webapp_name }}xxx"
+        state: absent
+    register: folder_info
+
+    - name: rename the {{ webapp_name }}.war.tmp to {{ webapp_name }}.war
+    win_command: "cmd.exe /c rename {{ webapp_destination_folder }}\\{{ webapp_name }}.war.tmp {{ webapp_name }}.war"
+    register: cmd_result 
